@@ -1,18 +1,20 @@
 version: '2'
 
 networks:
-  app-network:
+  auin-network:
     driver: bridge
 
 services:
-  app-backend-api:
+  project-app-backend-api:
     container_name: ${PROJECT_NAME}-api-${BACKEND_TECH}
     restart: always
     build:
       context:  ../
       dockerfile: ./local/docker/api/files/Dockerfile
     networks:
-      - app-network
+      - auin-network
+    depends_on:
+      - project-app-transactional-db
     volumes:
       - '../${API_BACKEND_DIR}/:/var/srv/app'
       - '/var/srv/app/node_modules'
@@ -28,7 +30,7 @@ services:
   #     context:  ../
   #     dockerfile: ./local/docker/web-frontend/files/Dockerfile
   #   networks:
-  #     - app-network
+  #     - auin-network
   #   volumes:
   #     - '../${WEB_FE_DIR}/:/var/srv/app'
   #     - '/var/srv/app/node_modules'
@@ -37,7 +39,7 @@ services:
   #   ports:
   #     - "${WEB_FE_HTTP_PORT}:3000"
 
-  transactional-db:
+  project-app-transactional-db:
     container_name: ${PROJECT_NAME}-db-${RELATIONAL_BD_TECH}
     image: postgres:${POSTGRESQL_VERSION}-alpine
     restart: always
@@ -46,13 +48,13 @@ services:
       - POSTGRES_USER=${PROJECT_NAME}
       - POSTGRES_PASSWORD=${PROJECT_NAME}
     networks:
-      - app-network
+      - auin-network
     volumes:
       - ./docker/db/data:/var/lib/postgresql/data:rw
     ports:
       - "${PG_HOST_PORT}:5432"
 
-  redis:
+  project-app-redis:
     image: redis:${REDIS_VERSION}-alpine
     container_name: ${PROJECT_NAME}-cache-redis
     restart: always
@@ -60,11 +62,11 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     networks:
-      - app-network
+      - auin-network
     ports:
       - "${REDIS_PORT}:6379"
 
-  app-rabbitmq:
+  project-app-rabbitmq:
     build:        
       context: ../
       dockerfile: ./local/docker/queue/files/Dockerfile
@@ -78,4 +80,4 @@ services:
       - ./${CONFIG_MAIN_DIR}:/etc/rabbitmq:rw
       - ./${CONFIG_MAIN_DIR}/data:/var/lib/rabbitmq
     networks:
-      - app-network
+      - auin-network
