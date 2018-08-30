@@ -1,7 +1,7 @@
 version: '2'
 
 networks:
-  app-network:
+  tsp-network:
     driver: bridge
 
 services:
@@ -12,7 +12,7 @@ services:
       context:  ../
       dockerfile: ./local/docker/api/files/Dockerfile
     networks:
-      - app-network
+      - tsp-network
     depends_on:
       - transactional-db
     volumes:
@@ -32,7 +32,7 @@ services:
   #     context:  ../
   #     dockerfile: ./local/docker/web-frontend/files/Dockerfile
   #   networks:
-  #     - app-network
+  #     - tsp-network
   #   volumes:
   #     - '../${WEB_FE_DIR}/:/var/srv/app'
   #     - '/var/srv/app/node_modules'
@@ -50,7 +50,7 @@ services:
       - POSTGRES_USER=${PROJECT_NAME}
       - POSTGRES_PASSWORD=${PROJECT_NAME}
     networks:
-      - app-network
+      - tsp-network
     volumes:
       - ./docker/db/data:/var/lib/postgresql/data:rw
     ports:
@@ -64,7 +64,7 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     networks:
-      - app-network
+      - tsp-network
     ports:
       - "${REDIS_PORT}:6379"
 
@@ -82,4 +82,4 @@ services:
       - ./${CONFIG_MAIN_DIR}:/etc/rabbitmq:rw
       - ./${CONFIG_MAIN_DIR}/data:/var/lib/rabbitmq
     networks:
-      - app-network
+      - tsp-network
