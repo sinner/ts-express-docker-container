@@ -13,13 +13,17 @@ services:
       dockerfile: ./local/docker/api/files/Dockerfile
     networks:
       - app-network
+    depends_on:
+      - transactional-db
     volumes:
       - '../${API_BACKEND_DIR}/:/var/srv/app'
       - '/var/srv/app/node_modules'
     environment:
       - NODE_ENV=development
     ports:
-      - "${API_HOST_HTTP_PORT}:3000"
+      - "${API_HOST_HTTP_PORT}:3080"
+      - "${API_HOST_HTTPS_PORT}:3080"
+      
 
   # app-frontend-web:
   #   container_name: ${PROJECT_NAME}-web-${FRONTEND_TECH}
